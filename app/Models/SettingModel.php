@@ -43,7 +43,7 @@ class SettingModel extends Model
     /**
      * Define o valor de uma configuração
      */
-    public function set(string $key, $value, string $type = 'string', string $group = 'general'): bool
+    public function setValue(string $key, $value, string $type = 'string', string $group = 'general'): bool
     {
         $existing = $this->where('key', $key)->first();
 

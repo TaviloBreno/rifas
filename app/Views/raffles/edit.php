@@ -4,36 +4,370 @@
 
 <?= $this->section('content') ?>
 
-<section class="hero is-primary is-small">
-    <div class="hero-body">
-        <div class="container">
-            <h1 class="title">
-                <i class="fas fa-edit"></i> Editar Rifa
-            </h1>
-            <p class="subtitle">
-                Atualize as informações da rifa
-            </p>
-        </div>
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        padding: 5rem 0 3.5rem;
+        margin-top: -2rem;
+        position: relative;
+        color: white;
+    }
+    
+    .form-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .form-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+        color: #1a1a2e;
+    }
+    
+    .hero-subtitle {
+        color: rgba(0,0,0,0.7);
+    }
+    
+    .form-main {
+        margin-top: -2rem;
+        position: relative;
+        z-index: 10;
+        padding-bottom: 3rem;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 25px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+    
+    .breadcrumb-custom {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+    
+    .error-box {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .error-box strong {
+        color: #721c24;
+    }
+    
+    .error-box ul {
+        margin-top: 0.5rem;
+        margin-left: 1rem;
+        color: #721c24;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-title i {
+        color: #ffc107;
+    }
+    
+    .field-label {
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 0.5rem;
+    }
+    
+    .modern-input {
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-input:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+    }
+    
+    .modern-input.is-danger {
+        border-color: #dc3545;
+    }
+    
+    .input-wrapper {
+        position: relative;
+    }
+    
+    .input-wrapper i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 2;
+    }
+    
+    .modern-textarea {
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        min-height: 120px;
+    }
+    
+    .modern-textarea:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+    }
+    
+    .modern-select {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        background: white;
+        cursor: pointer;
+        appearance: none;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+        outline: none;
+    }
+    
+    .select-wrapper {
+        position: relative;
+    }
+    
+    .select-wrapper i.select-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 2;
+    }
+    
+    .select-wrapper i.arrow-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        pointer-events: none;
+    }
+    
+    .field-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .current-image {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+    
+    .current-image-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .current-image img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+    
+    .upload-area {
+        border: 2px dashed #e0e0e0;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        border-color: #ffc107;
+        background: rgba(255, 193, 7, 0.05);
+    }
+    
+    .upload-area.has-file {
+        border-color: #ffc107;
+        background: rgba(255, 193, 7, 0.05);
+    }
+    
+    .upload-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    
+    .upload-icon i {
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .upload-text {
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 0.25rem;
+    }
+    
+    .upload-hint {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .preview-container {
+        margin-top: 1rem;
+        border-radius: 15px;
+        overflow: hidden;
+        max-width: 300px;
+    }
+    
+    .preview-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .preview-container img {
+        width: 100%;
+        border-radius: 15px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+    
+    .submit-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: #1a1a2e;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.4);
+    }
+    
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        background: #f0f0f0;
+        color: #495057;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background: #e0e0e0;
+        color: #1a1a2e;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .submit-btn, .back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="form-hero">
+    <div class="container">
+        <h1 class="hero-title">
+            <i class="fas fa-edit"></i> Editar Rifa
+        </h1>
+        <p class="hero-subtitle">Atualize as informações da rifa</p>
     </div>
 </section>
 
-<section class="section">
+<!-- Main Content -->
+<section class="section form-main">
     <div class="container">
         <div class="columns is-centered">
             <div class="column is-8">
-                <div class="box">
-                    <nav class="breadcrumb" aria-label="breadcrumbs">
+                <div class="form-card">
+                    <nav class="breadcrumb breadcrumb-custom" aria-label="breadcrumbs">
                         <ul>
-                            <li><a href="<?= site_url('raffles') ?>">Rifas</a></li>
+                            <li><a href="<?= site_url('raffles') ?>"><i class="fas fa-ticket-alt mr-1"></i> Rifas</a></li>
                             <li><a href="<?= site_url('raffles/' . $raffle->id) ?>"><?= esc($raffle->name) ?></a></li>
                             <li class="is-active"><a href="#" aria-current="page">Editar</a></li>
                         </ul>
                     </nav>
 
                     <?php if (session()->has('errors')): ?>
-                        <div class="notification is-danger is-light">
-                            <button class="delete"></button>
-                            <strong>Erro ao atualizar rifa:</strong>
+                        <div class="error-box">
+                            <strong><i class="fas fa-exclamation-circle mr-1"></i> Erro ao atualizar rifa:</strong>
                             <ul>
                                 <?php foreach (session('errors') as $error): ?>
                                     <li><?= esc($error) ?></li>
@@ -46,43 +380,52 @@
                         <?= csrf_field() ?>
                         <input type="hidden" name="_method" value="PUT">
 
-                        <div class="field">
-                            <label class="label">Nome da Rifa *</label>
-                            <div class="control has-icons-left">
-                                <input class="input <?= session('errors.name') ? 'is-danger' : '' ?>" 
-                                       type="text" 
-                                       name="name" 
-                                       placeholder="Ex: iPhone 15 Pro Max"
-                                       value="<?= old('name', $raffle->name) ?>"
-                                       required>
-                                <span class="icon is-small is-left">
-                                    <i class="fas fa-ticket-alt"></i>
-                                </span>
+                        <!-- Informações Básicas -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-info-circle"></i> Informações Básicas
                             </div>
-                            <?php if (session('errors.name')): ?>
-                                <p class="help is-danger"><?= session('errors.name') ?></p>
-                            <?php endif; ?>
-                        </div>
+                            
+                            <div class="field">
+                                <label class="field-label">Nome da Rifa *</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <input class="input modern-input <?= session('errors.name') ? 'is-danger' : '' ?>" 
+                                           type="text" 
+                                           name="name" 
+                                           placeholder="Ex: iPhone 15 Pro Max"
+                                           value="<?= old('name', $raffle->name) ?>"
+                                           required>
+                                </div>
+                                <?php if (session('errors.name')): ?>
+                                    <p class="help is-danger"><?= session('errors.name') ?></p>
+                                <?php endif; ?>
+                            </div>
 
-                        <div class="field">
-                            <label class="label">Descrição</label>
-                            <div class="control">
-                                <textarea class="textarea <?= session('errors.description') ? 'is-danger' : '' ?>" 
+                            <div class="field">
+                                <label class="field-label">Descrição</label>
+                                <textarea class="textarea modern-textarea <?= session('errors.description') ? 'is-danger' : '' ?>" 
                                           name="description" 
                                           placeholder="Descreva o prêmio e as regras da rifa..."
                                           rows="4"><?= old('description', $raffle->description) ?></textarea>
+                                <?php if (session('errors.description')): ?>
+                                    <p class="help is-danger"><?= session('errors.description') ?></p>
+                                <?php endif; ?>
                             </div>
-                            <?php if (session('errors.description')): ?>
-                                <p class="help is-danger"><?= session('errors.description') ?></p>
-                            <?php endif; ?>
                         </div>
 
-                        <div class="columns">
-                            <div class="column">
+                        <!-- Valores e Quantidade -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-calculator"></i> Valores e Quantidade
+                            </div>
+                            
+                            <div class="field-row">
                                 <div class="field">
-                                    <label class="label">Preço por Número *</label>
-                                    <div class="control has-icons-left">
-                                        <input class="input <?= session('errors.price') ? 'is-danger' : '' ?>" 
+                                    <label class="field-label">Preço por Número *</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        <input class="input modern-input <?= session('errors.price') ? 'is-danger' : '' ?>" 
                                                type="number" 
                                                name="price" 
                                                placeholder="10.00"
@@ -90,29 +433,23 @@
                                                min="0.01"
                                                value="<?= old('price', $raffle->price) ?>"
                                                required>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-dollar-sign"></i>
-                                        </span>
                                     </div>
                                     <?php if (session('errors.price')): ?>
                                         <p class="help is-danger"><?= session('errors.price') ?></p>
                                     <?php endif; ?>
                                 </div>
-                            </div>
-                            <div class="column">
+                                
                                 <div class="field">
-                                    <label class="label">Quantidade de Números *</label>
-                                    <div class="control has-icons-left">
-                                        <input class="input <?= session('errors.quantity') ? 'is-danger' : '' ?>" 
+                                    <label class="field-label">Quantidade de Números *</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-list-ol"></i>
+                                        <input class="input modern-input <?= session('errors.quantity') ? 'is-danger' : '' ?>" 
                                                type="number" 
                                                name="quantity" 
                                                placeholder="100"
                                                min="1"
                                                value="<?= old('quantity', $raffle->quantity) ?>"
                                                required>
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-list-ol"></i>
-                                        </span>
                                     </div>
                                     <?php if (session('errors.quantity')): ?>
                                         <p class="help is-danger"><?= session('errors.quantity') ?></p>
@@ -121,98 +458,80 @@
                             </div>
                         </div>
 
-                        <div class="columns">
-                            <div class="column">
+                        <!-- Data e Status -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-cog"></i> Configurações
+                            </div>
+                            
+                            <div class="field-row">
                                 <div class="field">
-                                    <label class="label">Data do Sorteio</label>
-                                    <div class="control has-icons-left">
-                                        <input class="input <?= session('errors.draw_date') ? 'is-danger' : '' ?>" 
+                                    <label class="field-label">Data do Sorteio</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-calendar"></i>
+                                        <input class="input modern-input <?= session('errors.draw_date') ? 'is-danger' : '' ?>" 
                                                type="date" 
                                                name="draw_date"
                                                value="<?= old('draw_date', $raffle->draw_date ? $raffle->draw_date->format('Y-m-d') : '') ?>">
-                                        <span class="icon is-small is-left">
-                                            <i class="fas fa-calendar-alt"></i>
-                                        </span>
                                     </div>
                                     <?php if (session('errors.draw_date')): ?>
                                         <p class="help is-danger"><?= session('errors.draw_date') ?></p>
                                     <?php endif; ?>
                                 </div>
-                            </div>
-                            <div class="column">
+                                
                                 <div class="field">
-                                    <label class="label">Status *</label>
-                                    <div class="control has-icons-left">
-                                        <div class="select is-fullwidth">
-                                            <select name="status" required>
-                                                <option value="active" <?= old('status', $raffle->status) === 'active' ? 'selected' : '' ?>>Ativa</option>
-                                                <option value="finished" <?= old('status', $raffle->status) === 'finished' ? 'selected' : '' ?>>Finalizada</option>
-                                                <option value="cancelled" <?= old('status', $raffle->status) === 'cancelled' ? 'selected' : '' ?>>Cancelada</option>
-                                            </select>
-                                        </div>
+                                    <label class="field-label">Status *</label>
+                                    <div class="select-wrapper">
+                                        <i class="fas fa-toggle-on select-icon"></i>
+                                        <select name="status" class="modern-select" required>
+                                            <option value="active" <?= old('status', $raffle->status) === 'active' ? 'selected' : '' ?>>Ativa</option>
+                                            <option value="finished" <?= old('status', $raffle->status) === 'finished' ? 'selected' : '' ?>>Finalizada</option>
+                                            <option value="cancelled" <?= old('status', $raffle->status) === 'cancelled' ? 'selected' : '' ?>>Cancelada</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down arrow-icon"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="field">
-                            <label class="label">Imagem do Prêmio</label>
+                        <!-- Imagem -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-image"></i> Imagem do Prêmio
+                            </div>
                             
                             <?php if ($raffle->image): ?>
-                                <div class="mb-3">
-                                    <p class="has-text-grey mb-2">Imagem atual:</p>
-                                    <figure class="image is-128x128">
-                                        <img src="<?= $raffle->getImageUrl() ?>" alt="Imagem atual">
-                                    </figure>
+                                <div class="current-image">
+                                    <div class="current-image-label">Imagem atual:</div>
+                                    <img src="<?= $raffle->getImageUrl() ?>" alt="Imagem atual">
                                 </div>
                             <?php endif; ?>
-
-                            <div class="file has-name is-fullwidth">
-                                <label class="file-label">
-                                    <input class="file-input" type="file" name="image" accept="image/*" id="imageInput">
-                                    <span class="file-cta">
-                                        <span class="file-icon">
-                                            <i class="fas fa-upload"></i>
-                                        </span>
-                                        <span class="file-label">
-                                            Escolher nova imagem…
-                                        </span>
-                                    </span>
-                                    <span class="file-name" id="fileName">
-                                        Nenhum arquivo selecionado
-                                    </span>
-                                </label>
-                            </div>
-                            <p class="help">Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 2MB</p>
+                            
+                            <label class="upload-area" id="uploadArea">
+                                <input class="file-input" type="file" name="image" accept="image/*" id="imageInput" style="display: none;">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text" id="uploadText">Clique para alterar a imagem</div>
+                                <div class="upload-hint">Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 2MB</div>
+                            </label>
                             <?php if (session('errors.image')): ?>
                                 <p class="help is-danger"><?= session('errors.image') ?></p>
                             <?php endif; ?>
-                        </div>
-
-                        <div id="imagePreview" class="mb-4" style="display: none;">
-                            <p class="has-text-grey mb-2">Nova imagem:</p>
-                            <figure class="image is-4by3" style="max-width: 300px;">
+                            
+                            <div id="imagePreview" class="preview-container" style="display: none;">
+                                <div class="preview-label">Nova imagem:</div>
                                 <img id="previewImg" src="" alt="Preview">
-                            </figure>
+                            </div>
                         </div>
 
-                        <div class="field is-grouped">
-                            <div class="control">
-                                <button type="submit" class="button is-primary">
-                                    <span class="icon">
-                                        <i class="fas fa-save"></i>
-                                    </span>
-                                    <span>Salvar Alterações</span>
-                                </button>
-                            </div>
-                            <div class="control">
-                                <a href="<?= site_url('raffles/' . $raffle->id) ?>" class="button is-light">
-                                    <span class="icon">
-                                        <i class="fas fa-arrow-left"></i>
-                                    </span>
-                                    <span>Voltar</span>
-                                </a>
-                            </div>
+                        <div class="form-actions">
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                            <a href="<?= site_url('raffles/' . $raffle->id) ?>" class="back-btn">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -222,15 +541,20 @@
 </section>
 
 <script>
-    // Preview da imagem
-    document.getElementById('imageInput').addEventListener('change', function(e) {
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const uploadText = document.getElementById('uploadText');
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+
+    uploadArea.addEventListener('click', () => imageInput.click());
+
+    imageInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        const fileName = document.getElementById('fileName');
-        const preview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
 
         if (file) {
-            fileName.textContent = file.name;
+            uploadText.textContent = file.name;
+            uploadArea.classList.add('has-file');
             
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -239,17 +563,28 @@
             }
             reader.readAsDataURL(file);
         } else {
-            fileName.textContent = 'Nenhum arquivo selecionado';
+            uploadText.textContent = 'Clique para alterar a imagem';
+            uploadArea.classList.remove('has-file');
             preview.style.display = 'none';
         }
     });
 
-    // Fecha notificações
-    document.querySelectorAll('.notification .delete').forEach(($delete) => {
-        const $notification = $delete.parentNode;
-        $delete.addEventListener('click', () => {
-            $notification.parentNode.removeChild($notification);
-        });
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('has-file');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        if (!imageInput.files.length) {
+            uploadArea.classList.remove('has-file');
+        }
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        imageInput.files = e.dataTransfer.files;
+        imageInput.dispatchEvent(new Event('change'));
     });
 </script>
 
