@@ -18,9 +18,17 @@ class Transfer extends Entity
     public function setPixKey(?string $pixKey): self
     {
         $pixKey = $pixKey !== null ? trim($pixKey) : null;
-        $this->attributes['pix_key_encrypted'] = $pixKey === null || $pixKey === ''
-            ? null
-            : service('encrypter')->encrypt($pixKey);
+        if ($pixKey === null || $pixKey === '') {
+            $this->attributes['pix_key_encrypted'] = null;
+            return $this;
+        }
+
+        try {
+            $this->attributes['pix_key_encrypted'] = service('encrypter')->encrypt($pixKey);
+        } catch (\Throwable $e) {
+            $this->attributes['pix_key_encrypted'] = null;
+            log_message('warning', 'Falha ao criptografar pix key: {message}', ['message' => $e->getMessage()]);
+        }
 
         return $this;
     }
@@ -47,7 +55,12 @@ class Transfer extends Entity
         }
 
         $json = is_string($payload) ? $payload : json_encode($payload, JSON_UNESCAPED_UNICODE);
-        $this->attributes['provider_payload_encrypted'] = service('encrypter')->encrypt((string) $json);
+        try {
+            $this->attributes['provider_payload_encrypted'] = service('encrypter')->encrypt((string) $json);
+        } catch (\Throwable $e) {
+            $this->attributes['provider_payload_encrypted'] = null;
+            log_message('warning', 'Falha ao criptografar payload de provider: {message}', ['message' => $e->getMessage()]);
+        }
         return $this;
     }
 

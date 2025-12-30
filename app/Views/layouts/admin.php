@@ -132,6 +132,9 @@
                 <a href="<?= site_url('admin/orders') ?>" class="<?= str_starts_with(uri_string(), 'admin/orders') ? 'is-active' : '' ?>">
                     <i class="fas fa-shopping-cart"></i> Pedidos
                 </a>
+                <a href="<?= site_url('admin/transfers') ?>" class="<?= str_starts_with(uri_string(), 'admin/transfers') ? 'is-active' : '' ?>">
+                    <i class="fas fa-money-bill-transfer"></i> Transferências
+                </a>
                 <a href="<?= site_url('admin/users') ?>" class="<?= str_starts_with(uri_string(), 'admin/users') ? 'is-active' : '' ?>">
                     <i class="fas fa-users"></i> Usuários
                 </a>
