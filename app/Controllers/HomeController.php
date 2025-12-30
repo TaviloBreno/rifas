@@ -10,6 +10,7 @@ use App\Models\WinnerModel;
 use App\Models\SettingModel;
 use App\Entities\Order;
 use App\Libraries\PixGenerator;
+use App\Services\TicketService;
 
 class HomeController extends BaseController
 {
@@ -189,7 +190,13 @@ class HomeController extends BaseController
         $numberIds = array_column($availableNumbers, 'id');
         $numberModel->reserveNumbers($numberIds, $orderId, session()->get('user_id'), $expirationMinutes);
 
-        return redirect()->to("/pagamento/{$orderId}");
+        try {
+            $ticketId = (new TicketService())->createFromOrder((int) $orderId);
+            return redirect()->to("/confirmacao/{$ticketId}");
+        } catch (\Throwable $e) {
+            // Fallback para o fluxo antigo
+            return redirect()->to("/pagamento/{$orderId}");
+        }
     }
 
     /**
