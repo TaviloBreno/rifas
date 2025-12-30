@@ -1,68 +1,116 @@
-# CodeIgniter 4 Application Starter
+# Rifas (CodeIgniter 4)
 
-## What is CodeIgniter?
+Sistema de rifas com painel administrativo, prêmios, reservas/compra de números, tickets e automações (sorteio e transferências).
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Stack
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+- PHP 8.3
+- CodeIgniter 4.6.x
+- MySQL/MariaDB
+- Composer
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## Setup local
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+1) Instalar dependências
 
-## Installation & updates
+```bash
+composer install
+```
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+2) Configurar ambiente
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+- Copie `env` para `.env`
+- Ajuste `app.baseURL` e as configurações de banco (`database.default.*`)
 
-## Setup
+3) Gerar chave de criptografia (obrigatório para dados criptografados)
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+```bash
+php spark key:generate
+```
 
-## Important Change with index.php
+4) Rodar migrations
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+```bash
+php spark migrate
+```
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+5) Subir servidor
 
-**Please** read the user guide for a better explanation of how CI4 works!
+```bash
+php spark serve
+```
 
-## Repository Management
+## Funcionalidades principais
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+- Rifas (admin): CRUD, geração de números, dashboard
+- Prêmios por rifa (admin): CRUD
+- Checkout: reserva de números + geração de ticket + confirmação de pagamento
+- Sorteio:
+	- Manual via admin
+	- Automático via comando `spark`
+- Transferências (prêmios):
+	- Fila e execução via comando `spark`
+	- Armazena payload/PIX key criptografados
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+## Comandos (Spark)
 
-## Server Requirements
+### Sorteio automático
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+- Sortear rifas elegíveis (status `active`, `draw_date <= hoje`, com números vendidos e sem winners):
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+```bash
+php spark raffles:draw
+```
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+- Sortear uma rifa específica:
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+```bash
+php spark raffles:draw --raffle 123
+```
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+- Simular sem gravar:
+
+```bash
+php spark raffles:draw --dry-run
+```
+
+### Transferências (prêmios)
+
+O módulo de transferências registra e processa pagamentos de prêmios. No MVP, o provider `manual` apenas marca como pago.
+
+- Criar fila de transferências a partir dos ganhadores e executar:
+
+```bash
+php spark transfers:run --queue
+```
+
+- Executar apenas pendentes:
+
+```bash
+php spark transfers:run
+```
+
+- Simular:
+
+```bash
+php spark transfers:run --dry-run
+```
+
+## E-mail
+
+Notificações usam a configuração de e-mail do CodeIgniter (SMTP recomendado). O projeto inclui `phpmailer/phpmailer` e utiliza PHPMailer quando `Email::$protocol = smtp`.
+
+Configure em `app/Config/Email.php` e/ou `.env` os campos:
+
+- `fromEmail`, `fromName`
+- `SMTPHost`, `SMTPUser`, `SMTPPass`, `SMTPPort`, `SMTPCrypto`
+
+## Uploads
+
+- Uploads públicos: `public/uploads`
+- Pastas graváveis: `writable/*`
+
+## Segurança e notas
+
+- Dados sensíveis em transferências (PIX key e payload) são armazenados criptografados; a chave depende do `encryption.key`.
+- Em produção, configure SMTP e variáveis de ambiente.
