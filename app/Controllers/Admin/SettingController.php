@@ -43,6 +43,14 @@ class SettingController extends BaseController
     }
 
     /**
+     * Compatibilidade com rotas antigas: POST admin/settings
+     */
+    public function update()
+    {
+        return $this->save();
+    }
+
+    /**
      * Configurações de pagamento
      */
     public function payment()
@@ -70,5 +78,13 @@ class SettingController extends BaseController
         $this->settingModel->updateMultiple($settings);
 
         return redirect()->to('admin/settings/payment')->with('success', 'Configurações de pagamento salvas!');
+    }
+
+    /**
+     * Compatibilidade com rotas antigas: POST admin/settings/payment
+     */
+    public function updatePayment()
+    {
+        return $this->savePayment();
     }
 }
