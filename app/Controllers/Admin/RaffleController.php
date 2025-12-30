@@ -35,6 +35,55 @@ class RaffleController extends BaseController
     }
 
     /**
+     * Endpoint para recuperar rifas (ex: autocomplete/associação)
+     * GET /admin/raffles/search?q=...&status=active&limit=20
+     */
+    public function search()
+    {
+        $term = trim((string) $this->request->getGet('q'));
+        $status = $this->request->getGet('status');
+        $limit = (int) ($this->request->getGet('limit') ?? 20);
+        $limit = max(1, min(50, $limit));
+
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            return $this->response->setStatusCode(401)->setJSON(['items' => []]);
+        }
+
+        $builder = $this->raffleModel
+            ->select('id, name, slug, status, created_at')
+            ->where('user_id', $userId);
+
+        if (is_string($status) && $status !== '') {
+            $builder->where('status', $status);
+        }
+
+        if ($term !== '') {
+            $builder
+                ->groupStart()
+                ->like('name', $term)
+                ->orLike('description', $term)
+                ->groupEnd();
+        }
+
+        $raffles = $builder
+            ->orderBy('created_at', 'DESC')
+            ->limit($limit)
+            ->findAll();
+
+        $items = array_map(static function ($raffle) {
+            return [
+                'id'     => (int) $raffle->id,
+                'text'   => (string) ($raffle->name ?? $raffle->slug ?? ('Rifa #' . $raffle->id)),
+                'status' => (string) ($raffle->status ?? ''),
+                'slug'   => (string) ($raffle->slug ?? ''),
+            ];
+        }, $raffles);
+
+        return $this->response->setJSON(['items' => $items]);
+    }
+
+    /**
      * Formulário de nova rifa
      */
     public function new()

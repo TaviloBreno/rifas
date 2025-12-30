@@ -66,6 +66,7 @@ $routes->group('admin', ['filter' => 'auth', 'namespace' => 'App\Controllers\Adm
     // Rifas
     $routes->get('raffles', 'RaffleController::index');
     $routes->get('raffles/create', 'RaffleController::create');
+    $routes->get('raffles/search', 'RaffleController::search');
     $routes->post('raffles', 'RaffleController::store');
     $routes->get('raffles/(:num)', 'RaffleController::show/$1');
     $routes->get('raffles/(:num)/edit', 'RaffleController::edit/$1');
