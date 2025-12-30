@@ -40,6 +40,13 @@
 </div>
 
 <div class="box">
+    <div class="notification is-info is-light">
+        <strong>Rifa:</strong>
+        <a href="<?= site_url('admin/raffles/' . $raffle->id) ?>">
+            <?= esc($raffle->title ?? $raffle->name ?? 'Rifa') ?>
+        </a>
+    </div>
+
     <form action="<?= site_url('admin/raffles/' . $raffle->id . '/prizes/' . $prize->id) ?>" method="post" enctype="multipart/form-data">
         <?= csrf_field() ?>
         <input type="hidden" name="_method" value="PUT">

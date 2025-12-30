@@ -145,6 +145,68 @@
                     <?= nl2br(esc((string) $raffle->prize_description)) ?>
                 </div>
             <?php endif; ?>
+
+            <h4 class="subtitle is-6 mt-5">Prêmios Associados</h4>
+            <?php if (empty($prizes)): ?>
+                <div class="notification is-light">
+                    <p class="mb-3">Nenhum prêmio cadastrado para esta rifa.</p>
+                    <a class="button is-info is-light" href="<?= site_url('admin/raffles/' . $raffle->id . '/prizes') ?>">
+                        <span class="icon"><i class="fas fa-gift"></i></span>
+                        <span>Gerenciar Prêmios</span>
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                            <tr>
+                                <th>Posição</th>
+                                <th>Prêmio</th>
+                                <th>Ganhador</th>
+                                <th class="has-text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($prizes as $prize): ?>
+                                <tr>
+                                    <td>
+                                        <span class="tag <?= $prize->getPositionClass() ?> is-light">
+                                            <?= esc($prize->getPositionLabel()) ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong><?= esc($prize->name) ?></strong>
+                                        <?php if ($prize->value): ?>
+                                            <span class="tag is-success is-light ml-2"><?= esc($prize->getFormattedValue()) ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($prize->isDrawn()): ?>
+                                            Nº <?= (int) $prize->winner_number ?>
+                                            <?php if (!empty($prize->winner_name)): ?>
+                                                — <?= esc($prize->winner_name) ?>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span class="has-text-grey">Não definido</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="has-text-right">
+                                        <a class="button is-small is-warning" href="<?= site_url('admin/raffles/' . $raffle->id . '/prizes/' . $prize->id . '/edit') ?>">
+                                            <span class="icon"><i class="fas fa-edit"></i></span>
+                                            <span>Editar</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <a class="button is-info is-light" href="<?= site_url('admin/raffles/' . $raffle->id . '/prizes') ?>">
+                    <span class="icon"><i class="fas fa-gift"></i></span>
+                    <span>Ver todos</span>
+                </a>
+            <?php endif; ?>
         </div>
     </div>
     
