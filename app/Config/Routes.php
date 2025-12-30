@@ -110,6 +110,10 @@ $routes->group('admin', ['filter' => 'auth', 'namespace' => 'App\Controllers\Adm
     $routes->post('settings', 'SettingController::update');
     $routes->get('settings/payment', 'SettingController::payment');
     $routes->post('settings/payment', 'SettingController::updatePayment');
+
+    // Transferências
+    $routes->get('transfers', 'TransferController::index');
+    $routes->get('transfers/(:num)', 'TransferController::show/$1');
 });
 
 // ============================================
