@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\RaffleModel;
 use App\Models\RaffleNumberModel;
+use App\Models\PrizeModel;
 use App\Models\WinnerModel;
 use App\Entities\Raffle;
 
@@ -12,11 +13,13 @@ class RaffleController extends BaseController
 {
     protected RaffleModel $raffleModel;
     protected RaffleNumberModel $numberModel;
+    protected PrizeModel $prizeModel;
 
     public function __construct()
     {
         $this->raffleModel = new RaffleModel();
         $this->numberModel = new RaffleNumberModel();
+        $this->prizeModel  = new PrizeModel();
     }
 
     /**
@@ -123,6 +126,7 @@ class RaffleController extends BaseController
             'raffle'  => $raffle,
             'numbers' => $this->numberModel->getAllByRaffle($id),
             'stats'   => $this->numberModel->getStats($id),
+            'prizes'  => $this->prizeModel->getByRaffle((int) $id),
         ];
 
         return view('admin/raffles/show', $data);
