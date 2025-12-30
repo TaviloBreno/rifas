@@ -43,7 +43,7 @@
                 <div class="field">
                     <label class="label">Título *</label>
                     <div class="control">
-                        <input class="input" type="text" name="title" value="<?= old('title', $raffle->title ?? '') ?>" required placeholder="Ex: iPhone 15 Pro Max">
+                        <input class="input" type="text" name="name" value="<?= old('name', $raffle->name ?? '') ?>" required placeholder="Ex: iPhone 15 Pro Max">
                     </div>
                 </div>
             </div>
@@ -53,8 +53,7 @@
                     <div class="control">
                         <div class="select is-fullwidth">
                             <select name="status">
-                                <option value="pending" <?= old('status', $raffle->status ?? 'pending') === 'pending' ? 'selected' : '' ?>>Pendente</option>
-                                <option value="active" <?= old('status', $raffle->status ?? '') === 'active' ? 'selected' : '' ?>>Ativa</option>
+                                <option value="active" <?= old('status', $raffle->status ?? 'active') === 'active' ? 'selected' : '' ?>>Ativa</option>
                                 <option value="finished" <?= old('status', $raffle->status ?? '') === 'finished' ? 'selected' : '' ?>>Finalizada</option>
                                 <option value="cancelled" <?= old('status', $raffle->status ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelada</option>
                             </select>
@@ -98,7 +97,7 @@
                 <div class="field">
                     <label class="label">Total de Números *</label>
                     <div class="control has-icons-left">
-                        <input class="input" type="number" min="1" name="total_numbers" value="<?= old('total_numbers', $raffle->total_numbers ?? 100) ?>" required <?= isset($raffle) ? 'readonly' : '' ?>>
+                        <input class="input" type="number" min="1" name="quantity" value="<?= old('quantity', $raffle->quantity ?? 100) ?>" required <?= isset($raffle) ? 'readonly' : '' ?>>
                         <span class="icon is-small is-left">
                             <i class="fas fa-hashtag"></i>
                         </span>
@@ -148,27 +147,6 @@
         
         <div class="columns">
             <div class="column">
-                <div class="field">
-                    <label class="label">Data de Início</label>
-                    <div class="control has-icons-left">
-                        <input class="input" type="datetime-local" name="start_date" value="<?= old('start_date', isset($raffle->start_date) ? date('Y-m-d\TH:i', strtotime($raffle->start_date)) : '') ?>">
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-calendar-alt"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <div class="field">
-                    <label class="label">Data de Encerramento</label>
-                    <div class="control has-icons-left">
-                        <input class="input" type="datetime-local" name="end_date" value="<?= old('end_date', isset($raffle->end_date) ? date('Y-m-d\TH:i', strtotime($raffle->end_date)) : '') ?>">
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-calendar-check"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
             <div class="column">
                 <div class="field">
                     <label class="label">Data do Sorteio</label>
@@ -205,7 +183,7 @@
             <?php if (isset($raffle->image) && $raffle->image): ?>
                 <div class="mt-3">
                     <figure class="image is-128x128">
-                        <img src="<?= base_url('uploads/raffles/' . $raffle->image) ?>" alt="Imagem atual" style="object-fit: cover; border-radius: 4px;">
+                        <img src="<?= base_url('uploads/' . $raffle->image) ?>" alt="Imagem atual" style="object-fit: cover; border-radius: 4px;">
                     </figure>
                     <p class="help">Imagem atual. Selecione um novo arquivo para substituir.</p>
                 </div>

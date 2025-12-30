@@ -62,11 +62,11 @@
                                 <div class="is-flex is-align-items-center">
                                     <?php if ($raffle->image): ?>
                                         <figure class="image is-32x32 mr-2">
-                                            <img src="<?= base_url('uploads/raffles/' . $raffle->image) ?>" alt="<?= esc($raffle->title) ?>" style="object-fit: cover; border-radius: 4px;">
+                                            <img src="<?= base_url('uploads/' . $raffle->image) ?>" alt="<?= esc($raffle->name) ?>" style="object-fit: cover; border-radius: 4px;">
                                         </figure>
                                     <?php endif; ?>
                                     <div>
-                                        <strong><?= esc($raffle->title) ?></strong>
+                                        <strong><?= esc($raffle->name) ?></strong>
                                         <?php if ($raffle->is_featured): ?>
                                             <span class="tag is-warning is-light ml-1">Destaque</span>
                                         <?php endif; ?>
@@ -74,7 +74,7 @@
                                 </div>
                             </td>
                             <td>R$ <?= number_format($raffle->price, 2, ',', '.') ?></td>
-                            <td><?= number_format($raffle->total_numbers, 0, '', '.') ?></td>
+                            <td><?= number_format($raffle->quantity, 0, '', '.') ?></td>
                             <td>
                                 <?php 
                                 $soldCount = isset($raffle->sold_count) ? $raffle->sold_count : 0;
@@ -124,7 +124,7 @@
                                             <span class="icon"><i class="fas fa-trophy"></i></span>
                                         </button>
                                     <?php endif; ?>
-                                    <button type="button" class="button is-danger is-outlined" title="Excluir" onclick="confirmDelete(<?= $raffle->id ?>, '<?= esc($raffle->title) ?>')">
+                                    <button type="button" class="button is-danger is-outlined" title="Excluir" onclick="confirmDelete(<?= $raffle->id ?>, '<?= esc($raffle->name) ?>')">
                                         <span class="icon"><i class="fas fa-trash"></i></span>
                                     </button>
                                 </div>

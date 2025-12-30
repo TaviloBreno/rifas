@@ -5,7 +5,7 @@
 <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
         <li><a href="<?= site_url('admin/raffles') ?>">Rifas</a></li>
-        <li class="is-active"><a href="#" aria-current="page"><?= esc($raffle->title) ?></a></li>
+        <li class="is-active"><a href="#" aria-current="page"><?= esc($raffle->name) ?></a></li>
     </ul>
 </nav>
 
@@ -26,7 +26,7 @@
 <div class="level">
     <div class="level-left">
         <div class="level-item">
-            <h1 class="title"><?= esc($raffle->title) ?></h1>
+            <h1 class="title"><?= esc($raffle->name) ?></h1>
         </div>
         <div class="level-item">
             <?php
@@ -85,7 +85,7 @@
         <div class="box">
             <?php if ($raffle->image): ?>
                 <figure class="image is-4by3 mb-4">
-                    <img src="<?= base_url('uploads/raffles/' . $raffle->image) ?>" alt="<?= esc($raffle->title) ?>" style="object-fit: cover; border-radius: 4px;">
+                    <img src="<?= base_url('uploads/' . $raffle->image) ?>" alt="<?= esc($raffle->name) ?>" style="object-fit: cover; border-radius: 4px;">
                 </figure>
             <?php endif; ?>
             
@@ -99,7 +99,7 @@
                     </tr>
                     <tr>
                         <th>Total de Números:</th>
-                        <td><?= number_format($raffle->total_numbers, 0, '', '.') ?></td>
+                        <td><?= number_format($raffle->quantity, 0, '', '.') ?></td>
                     </tr>
                     <tr>
                         <th>Início:</th>
@@ -108,14 +108,6 @@
                     <tr>
                         <th>Mín/Máx Compra:</th>
                         <td><?= $raffle->min_per_purchase ?? 1 ?> / <?= $raffle->max_per_purchase ?? '∞' ?></td>
-                    </tr>
-                    <tr>
-                        <th>Data Início:</th>
-                        <td><?= $raffle->start_date ? date('d/m/Y H:i', strtotime($raffle->start_date)) : '-' ?></td>
-                    </tr>
-                    <tr>
-                        <th>Data Fim:</th>
-                        <td><?= $raffle->end_date ? date('d/m/Y H:i', strtotime($raffle->end_date)) : '-' ?></td>
                     </tr>
                     <tr>
                         <th>Data Sorteio:</th>
