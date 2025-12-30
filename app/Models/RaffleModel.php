@@ -15,12 +15,21 @@ class RaffleModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'name',
+        'slug',
         'description',
+        'prize_description',
         'image',
         'price',
         'quantity',
+        'start_number',
+        'min_per_purchase',
+        'max_per_purchase',
+        'numbers_generated',
+        'winning_number',
+        'user_id',
         'draw_date',
         'status',
+        'is_featured',
     ];
 
     // Dates
@@ -68,11 +77,80 @@ class RaffleModel extends Model
     protected $cleanValidationRules = true;
 
     /**
+     * Callbacks
+     */
+    protected $beforeInsert = ['generateSlug'];
+    protected $beforeUpdate = ['generateSlug'];
+
+    /**
+     * Gera slug automaticamente
+     */
+    protected function generateSlug(array $data): array
+    {
+        if (isset($data['data']['name']) && empty($data['data']['slug'])) {
+            $slug = url_title($data['data']['name'], '-', true);
+            $slug = $this->makeUniqueSlug($slug, $data['data']['id'] ?? null);
+            $data['data']['slug'] = $slug;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Garante que o slug seja único
+     */
+    protected function makeUniqueSlug(string $slug, ?int $excludeId = null): string
+    {
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (true) {
+            $builder = $this->where('slug', $slug);
+            
+            if ($excludeId) {
+                $builder->where('id !=', $excludeId);
+            }
+
+            if ($builder->countAllResults() === 0) {
+                break;
+            }
+
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
      * Retorna apenas rifas ativas
      */
     public function getActive()
     {
-        return $this->where('status', 'active')->findAll();
+        return $this->where('status', 'active')
+                    ->orderBy('is_featured', 'DESC')
+                    ->orderBy('created_at', 'DESC')
+                    ->findAll();
+    }
+
+    /**
+     * Retorna rifas em destaque
+     */
+    public function getFeatured(int $limit = 6)
+    {
+        return $this->where('status', 'active')
+                    ->where('is_featured', 1)
+                    ->orderBy('created_at', 'DESC')
+                    ->limit($limit)
+                    ->findAll();
+    }
+
+    /**
+     * Busca rifa por slug
+     */
+    public function findBySlug(string $slug)
+    {
+        return $this->where('slug', $slug)->first();
     }
 
     /**
