@@ -14,6 +14,7 @@ class AuthController extends BaseController
     public function __construct()
     {
         $this->userModel = new UserModel();
+        helper('cookie');
     }
 
     /**
