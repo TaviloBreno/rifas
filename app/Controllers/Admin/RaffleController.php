@@ -8,6 +8,7 @@ use App\Models\RaffleNumberModel;
 use App\Models\PrizeModel;
 use App\Models\WinnerModel;
 use App\Entities\Raffle;
+use App\Services\RaffleDrawService;
 
 class RaffleController extends BaseController
 {
@@ -27,8 +28,16 @@ class RaffleController extends BaseController
      */
     public function index()
     {
+        $userId = session()->get('user_id');
+        $role = session()->get('user_role');
+
+        $builder = $this->raffleModel->orderBy('created_at', 'DESC');
+        if ($role !== 'admin') {
+            $builder->where('user_id', $userId);
+        }
+
         $data = [
-            'raffles' => $this->raffleModel->orderBy('created_at', 'DESC')->findAll(),
+            'raffles' => $builder->findAll(),
         ];
 
         return view('admin/raffles/index', $data);
@@ -183,6 +192,10 @@ class RaffleController extends BaseController
             return redirect()->to('admin/raffles')->with('error', 'Rifa não encontrada.');
         }
 
+        if (!$this->canAccessRaffle($raffle)) {
+            return redirect()->to('admin/raffles')->with('error', 'Você não tem permissão para acessar esta rifa.');
+        }
+
         $data = [
             'raffle'  => $raffle,
             'numbers' => $this->numberModel->getAllByRaffle($id),
@@ -204,6 +217,10 @@ class RaffleController extends BaseController
             return redirect()->to('admin/raffles')->with('error', 'Rifa não encontrada.');
         }
 
+        if (!$this->canAccessRaffle($raffle)) {
+            return redirect()->to('admin/raffles')->with('error', 'Você não tem permissão para acessar esta rifa.');
+        }
+
         return view('admin/raffles/form', [
             'raffle' => $raffle,
         ]);
@@ -218,6 +235,10 @@ class RaffleController extends BaseController
 
         if (!$raffle) {
             return redirect()->to('admin/raffles')->with('error', 'Rifa não encontrada.');
+        }
+
+        if (!$this->canAccessRaffle($raffle)) {
+            return redirect()->to('admin/raffles')->with('error', 'Você não tem permissão para atualizar esta rifa.');
         }
 
         $rules = [
@@ -284,6 +305,10 @@ class RaffleController extends BaseController
             return redirect()->to('admin/raffles')->with('error', 'Rifa não encontrada.');
         }
 
+        if (!$this->canAccessRaffle($raffle)) {
+            return redirect()->to('admin/raffles')->with('error', 'Você não tem permissão para excluir esta rifa.');
+        }
+
         // Verifica se tem números vendidos
         $soldCount = $this->numberModel->countByStatus($id, 'sold');
         if ($soldCount > 0) {
@@ -313,6 +338,10 @@ class RaffleController extends BaseController
             return redirect()->to('admin/raffles')->with('error', 'Rifa não encontrada.');
         }
 
+        if (!$this->canAccessRaffle($raffle)) {
+            return redirect()->to('admin/raffles')->with('error', 'Você não tem permissão para gerar números nesta rifa.');
+        }
+
         if ($raffle->numbers_generated) {
             return redirect()->to('admin/raffles/' . $id)->with('error', 'Os números já foram gerados para esta rifa.');
         }
@@ -334,53 +363,34 @@ class RaffleController extends BaseController
             return redirect()->to('admin/raffles')->with('error', 'Rifa não encontrada.');
         }
 
-        $winnerModel = new WinnerModel();
-
-        // Verifica se já foi sorteada
-        if ($winnerModel->hasWinner($id)) {
-            return redirect()->to('admin/raffles/' . $id)->with('error', 'Esta rifa já foi sorteada.');
+        if (!$this->canAccessRaffle($raffle)) {
+            return redirect()->to('admin/raffles')->with('error', 'Você não tem permissão para sortear esta rifa.');
         }
 
-        // Verifica se tem números vendidos
-        $soldCount = $this->numberModel->countByStatus($id, 'sold');
-        if ($soldCount === 0) {
-            return redirect()->to('admin/raffles/' . $id)->with('error', 'Não há números vendidos para sortear.');
+        $service = new RaffleDrawService();
+        $result = $service->drawRaffle((int) $id, true, false);
+
+        if (!$result['ok']) {
+            return redirect()->to('admin/raffles/' . $id)->with('error', $result['message']);
         }
 
-        // Sorteia um número aleatório
-        $winningNumber = $this->numberModel->drawRandomSoldNumber($id);
+        $first = $result['winners'][0] ?? null;
+        $winningNumber = $first['winning_number'] ?? null;
+        $msg = $winningNumber !== null
+            ? "Sorteio realizado! Número vencedor (1º prêmio): {$winningNumber}"
+            : 'Sorteio realizado!';
 
-        if (!$winningNumber) {
-            return redirect()->to('admin/raffles/' . $id)->with('error', 'Erro ao realizar o sorteio.');
+        return redirect()->to('admin/raffles/' . $id)->with('success', $msg);
+    }
+
+    private function canAccessRaffle($raffle): bool
+    {
+        $role = session()->get('user_role');
+        if ($role === 'admin') {
+            return true;
         }
 
-        // Busca dados do pedido
-        $orderModel = new \App\Models\OrderModel();
-        $order = $orderModel->find($winningNumber->order_id);
-
-        // Registra o ganhador
-        $winner = [
-            'raffle_id'        => $id,
-            'raffle_number_id' => $winningNumber->id,
-            'user_id'          => $winningNumber->user_id,
-            'order_id'         => $winningNumber->order_id,
-            'winning_number'   => $winningNumber->number,
-            'winner_name'      => $order->customer_name,
-            'winner_email'     => $order->customer_email,
-            'winner_phone'     => $order->customer_phone,
-            'prize_position'   => 1,
-            'prize_description'=> $raffle->prize_description,
-            'draw_date'        => date('Y-m-d H:i:s'),
-        ];
-
-        $winnerModel->insert($winner);
-
-        // Atualiza rifa
-        $this->raffleModel->update($id, [
-            'status'         => 'finished',
-            'winning_number' => $winningNumber->number,
-        ]);
-
-        return redirect()->to('admin/raffles/' . $id)->with('success', "Sorteio realizado! Número vencedor: {$winningNumber->number}");
+        $userId = session()->get('user_id');
+        return (int) ($raffle->user_id ?? 0) === (int) $userId;
     }
 }
