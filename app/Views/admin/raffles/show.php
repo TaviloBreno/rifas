@@ -55,6 +55,10 @@
                     <span class="icon"><i class="fas fa-edit"></i></span>
                     <span>Editar</span>
                 </a>
+                <a href="<?= site_url('admin/raffles/' . $raffle->id . '/prizes') ?>" class="button is-info is-light">
+                    <span class="icon"><i class="fas fa-gift"></i></span>
+                    <span>Gerenciar Prêmios</span>
+                </a>
                 <?php if ($raffle->status === 'active' && !$raffle->winning_number): ?>
                     <button type="button" class="button is-success" onclick="confirmDraw()">
                         <span class="icon"><i class="fas fa-trophy"></i></span>
@@ -131,14 +135,14 @@
             <?php if ($raffle->description): ?>
                 <h4 class="subtitle is-6 mt-4">Descrição</h4>
                 <div class="content">
-                    <?= nl2br(esc($raffle->description)) ?>
+                    <?= nl2br(esc((string) $raffle->description)) ?>
                 </div>
             <?php endif; ?>
             
             <?php if ($raffle->prize_description): ?>
                 <h4 class="subtitle is-6 mt-4">Prêmio</h4>
                 <div class="content">
-                    <?= nl2br(esc($raffle->prize_description)) ?>
+                    <?= nl2br(esc((string) $raffle->prize_description)) ?>
                 </div>
             <?php endif; ?>
         </div>
