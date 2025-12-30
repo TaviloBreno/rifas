@@ -9,6 +9,7 @@ use App\Models\RaffleNumberModel;
 use App\Models\UserModel;
 use App\Models\WinnerModel;
 use CodeIgniter\I18n\Time;
+use App\Services\EmailNotificationService;
 
 class RaffleDrawService
 {
@@ -19,6 +20,7 @@ class RaffleDrawService
         protected PrizeModel $prizeModel = new PrizeModel(),
         protected OrderModel $orderModel = new OrderModel(),
         protected UserModel $userModel = new UserModel(),
+        protected EmailNotificationService $mailer = new EmailNotificationService(),
     ) {
     }
 
@@ -223,9 +225,6 @@ class RaffleDrawService
             return $emails;
         }
 
-        $email = service('email');
-        $email->setMailType('html');
-
         // Email para o(s) ganhador(es)
         foreach ($winners as $winner) {
             $to = trim((string) ($winner['winner_email'] ?? ''));
@@ -237,13 +236,7 @@ class RaffleDrawService
             $subject = 'Resultado do sorteio: ' . (string) ($raffle->name ?? 'Rifa');
             $body = $this->renderWinnerEmailHtml($raffle, $winner);
 
-            $email->clear(true);
-            $email->setFrom($emailConfig->fromEmail, $emailConfig->fromName ?: 'Rifas');
-            $email->setTo($to);
-            $email->setSubject($subject);
-            $email->setMessage($body);
-
-            if ($email->send(false)) {
+            if ($this->mailer->send($to, $subject, $body)) {
                 $emails['winnerSent']++;
             } else {
                 log_message('warning', 'Falha ao enviar email para ganhador ({to}) da rifa {raffleId}.', [
@@ -261,13 +254,7 @@ class RaffleDrawService
             $subject = 'Sorteio realizado: ' . (string) ($raffle->name ?? 'Rifa');
             $body = $this->renderOwnerEmailHtml($raffle, $winners);
 
-            $email->clear(true);
-            $email->setFrom($emailConfig->fromEmail, $emailConfig->fromName ?: 'Rifas');
-            $email->setTo($ownerEmail);
-            $email->setSubject($subject);
-            $email->setMessage($body);
-
-            if ($email->send(false)) {
+            if ($this->mailer->send($ownerEmail, $subject, $body)) {
                 $emails['ownerSent']++;
             } else {
                 log_message('warning', 'Falha ao enviar email para criador ({to}) da rifa {raffleId}.', [
