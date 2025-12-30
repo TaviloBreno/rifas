@@ -42,12 +42,57 @@
             </div>
             <div id="navbarMain" class="navbar-menu">
                 <div class="navbar-start">
-                    <a class="navbar-item" href="<?= site_url('raffles') ?>">
-                        <i class="fas fa-list mr-1"></i> Minhas Rifas
-                    </a>
-                    <a class="navbar-item" href="<?= site_url('raffles/new') ?>">
-                        <i class="fas fa-plus mr-1"></i> Nova Rifa
-                    </a>
+                    <?php if (session()->get('logged_in')): ?>
+                        <a class="navbar-item" href="<?= site_url('raffles') ?>">
+                            <i class="fas fa-list mr-1"></i> Minhas Rifas
+                        </a>
+                        <a class="navbar-item" href="<?= site_url('raffles/new') ?>">
+                            <i class="fas fa-plus mr-1"></i> Nova Rifa
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <div class="navbar-end">
+                    <?php if (session()->get('logged_in')): ?>
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link">
+                                <span class="icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </span>
+                                <span><?= esc(session()->get('user_name')) ?></span>
+                            </a>
+                            <div class="navbar-dropdown is-right">
+                                <div class="navbar-item">
+                                    <span class="tag <?= session()->get('user_role') === 'admin' ? 'is-danger' : (session()->get('user_role') === 'funcionario' ? 'is-warning' : 'is-info') ?>">
+                                        <?= ucfirst(session()->get('user_role')) ?>
+                                    </span>
+                                </div>
+                                <hr class="navbar-divider">
+                                <a class="navbar-item" href="<?= site_url('logout') ?>">
+                                    <span class="icon has-text-danger">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </span>
+                                    <span>Sair</span>
+                                </a>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="navbar-item">
+                            <div class="buttons">
+                                <a class="button is-light" href="<?= site_url('login') ?>">
+                                    <span class="icon">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </span>
+                                    <span>Entrar</span>
+                                </a>
+                                <a class="button is-success" href="<?= site_url('register') ?>">
+                                    <span class="icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </span>
+                                    <span>Cadastrar</span>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
