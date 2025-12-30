@@ -58,4 +58,37 @@ class TicketService
 
         return (int) $ticketId;
     }
+
+    public function syncFromOrder(int $orderId): void
+    {
+        $ticket = $this->ticketModel->findByOrderId($orderId);
+        if (!$ticket) {
+            return;
+        }
+
+        $order = $this->orderModel->find($orderId);
+        if (!$order) {
+            return;
+        }
+
+        $this->ticketModel->update((int) $ticket->id, [
+            'status'         => $order->status,
+            'payment_method' => $order->payment_method ?? null,
+            'payment_id'     => $order->payment_id ?? null,
+            'paid_at'        => $order->paid_at ?? null,
+            'expires_at'     => $order->expires_at ?? null,
+        ]);
+
+        if ($order->status === 'paid') {
+            $this->entryModel->where('ticket_id', (int) $ticket->id)
+                ->set(['status' => 'sold'])
+                ->update();
+            return;
+        }
+
+        if (in_array($order->status, ['cancelled', 'expired'], true)) {
+            // Os números foram (ou serão) liberados; remove as entradas para evitar inconsistência
+            $this->entryModel->where('ticket_id', (int) $ticket->id)->delete();
+        }
+    }
 }

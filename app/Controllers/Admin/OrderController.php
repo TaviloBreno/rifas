@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\OrderModel;
 use App\Models\RaffleModel;
 use App\Models\RaffleNumberModel;
+use App\Services\TicketService;
 
 class OrderController extends BaseController
 {
@@ -81,6 +82,9 @@ class OrderController extends BaseController
         // Confirma venda dos números
         $this->numberModel->confirmSale($id);
 
+        // Sincroniza ticket/entradas
+        (new TicketService())->syncFromOrder((int) $id);
+
         return redirect()->to('admin/orders/' . $id)->with('success', 'Pagamento confirmado com sucesso!');
     }
 
@@ -106,6 +110,9 @@ class OrderController extends BaseController
 
         // Libera os números
         $this->numberModel->releaseNumbers($id);
+
+        // Sincroniza ticket/entradas
+        (new TicketService())->syncFromOrder((int) $id);
 
         return redirect()->to('admin/orders/' . $id)->with('success', 'Pedido cancelado com sucesso!');
     }
