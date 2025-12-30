@@ -53,6 +53,9 @@ $routes->group('', ['filter' => 'guest'], function ($routes) {
 // Logout (apenas para usuários logados)
 $routes->get('logout', 'AuthController::logout', ['filter' => 'auth']);
 
+// Atalho para o dashboard (evita 404 em /dashboard)
+$routes->get('dashboard', 'Admin\\DashboardController::index', ['filter' => 'auth']);
+
 // ============================================
 // ROTAS DO PAINEL ADMINISTRATIVO
 // ============================================

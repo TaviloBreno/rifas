@@ -44,6 +44,9 @@ class RaffleController extends BaseController
         $status = $this->request->getGet('status');
         $limit = (int) ($this->request->getGet('limit') ?? 20);
         $limit = max(1, min(50, $limit));
+        $page = (int) ($this->request->getGet('page') ?? 1);
+        $page = max(1, $page);
+        $offset = ($page - 1) * $limit;
 
         $userId = session()->get('user_id');
         if (!$userId) {
@@ -68,8 +71,13 @@ class RaffleController extends BaseController
 
         $raffles = $builder
             ->orderBy('created_at', 'DESC')
-            ->limit($limit)
+            ->limit($limit + 1, $offset)
             ->findAll();
+
+        $hasMore = count($raffles) > $limit;
+        if ($hasMore) {
+            $raffles = array_slice($raffles, 0, $limit);
+        }
 
         $items = array_map(static function ($raffle) {
             return [
@@ -80,7 +88,11 @@ class RaffleController extends BaseController
             ];
         }, $raffles);
 
-        return $this->response->setJSON(['items' => $items]);
+        return $this->response->setJSON([
+            'items'   => $items,
+            'page'    => $page,
+            'hasMore' => $hasMore,
+        ]);
     }
 
     /**
