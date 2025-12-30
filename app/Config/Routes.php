@@ -73,6 +73,14 @@ $routes->group('admin', ['filter' => 'auth', 'namespace' => 'App\Controllers\Adm
     $routes->delete('raffles/(:num)', 'RaffleController::delete/$1');
     $routes->post('raffles/(:num)/generate-numbers', 'RaffleController::generateNumbers/$1');
     $routes->post('raffles/(:num)/draw', 'RaffleController::draw/$1');
+
+    // Prmios
+    $routes->get('raffles/(:num)/prizes', 'PrizeController::index/$1');
+    $routes->get('raffles/(:num)/prizes/new', 'PrizeController::new/$1');
+    $routes->post('raffles/(:num)/prizes', 'PrizeController::create/$1');
+    $routes->get('raffles/(:num)/prizes/(:num)/edit', 'PrizeController::edit/$1/$2');
+    $routes->put('raffles/(:num)/prizes/(:num)', 'PrizeController::update/$1/$2');
+    $routes->delete('raffles/(:num)/prizes/(:num)', 'PrizeController::delete/$1/$2');
     
     // Pedidos
     $routes->get('orders', 'OrderController::index');
