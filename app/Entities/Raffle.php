@@ -9,9 +9,16 @@ class Raffle extends Entity
     protected $datamap = [];
     protected $dates   = ['created_at', 'updated_at', 'deleted_at', 'draw_date'];
     protected $casts   = [
-        'id'       => 'integer',
-        'price'    => 'float',
-        'quantity' => 'integer',
+        'id'                => 'integer',
+        'price'             => 'float',
+        'quantity'          => 'integer',
+        'start_number'      => 'integer',
+        'min_per_purchase'  => 'integer',
+        'max_per_purchase'  => 'integer',
+        'numbers_generated' => 'boolean',
+        'winning_number'    => '?integer',
+        'user_id'           => '?integer',
+        'is_featured'       => 'boolean',
     ];
 
     /**
@@ -19,7 +26,7 @@ class Raffle extends Entity
      */
     public function getFormattedPrice(): string
     {
-        return 'R$ ' . number_format($this->attributes['price'], 2, ',', '.');
+        return 'R$ ' . number_format($this->attributes['price'] ?? 0, 2, ',', '.');
     }
 
     /**
@@ -45,7 +52,7 @@ class Raffle extends Entity
             'cancelled' => 'Cancelada',
         ];
 
-        return $labels[$this->attributes['status']] ?? 'Desconhecido';
+        return $labels[$this->attributes['status'] ?? ''] ?? 'Desconhecido';
     }
 
     /**
@@ -59,7 +66,7 @@ class Raffle extends Entity
             'cancelled' => 'is-danger',
         ];
 
-        return $classes[$this->attributes['status']] ?? 'is-warning';
+        return $classes[$this->attributes['status'] ?? ''] ?? 'is-warning';
     }
 
     /**
@@ -79,7 +86,31 @@ class Raffle extends Entity
      */
     public function isActive(): bool
     {
-        return $this->attributes['status'] === 'active';
+        return ($this->attributes['status'] ?? '') === 'active';
+    }
+
+    /**
+     * Verifica se a rifa está finalizada
+     */
+    public function isFinished(): bool
+    {
+        return ($this->attributes['status'] ?? '') === 'finished';
+    }
+
+    /**
+     * Verifica se os números foram gerados
+     */
+    public function hasNumbersGenerated(): bool
+    {
+        return (bool) ($this->attributes['numbers_generated'] ?? false);
+    }
+
+    /**
+     * Verifica se é destaque
+     */
+    public function isFeatured(): bool
+    {
+        return (bool) ($this->attributes['is_featured'] ?? false);
     }
 
     /**
@@ -103,7 +134,7 @@ class Raffle extends Entity
      */
     public function getTotalValue(): float
     {
-        return $this->attributes['price'] * $this->attributes['quantity'];
+        return ($this->attributes['price'] ?? 0) * ($this->attributes['quantity'] ?? 0);
     }
 
     /**
@@ -112,5 +143,42 @@ class Raffle extends Entity
     public function getFormattedTotalValue(): string
     {
         return 'R$ ' . number_format($this->getTotalValue(), 2, ',', '.');
+    }
+
+    /**
+     * Retorna o último número disponível
+     */
+    public function getLastNumber(): int
+    {
+        return ($this->attributes['start_number'] ?? 0) + ($this->attributes['quantity'] ?? 0) - 1;
+    }
+
+    /**
+     * Retorna a URL pública da rifa
+     */
+    public function getPublicUrl(): string
+    {
+        return base_url('rifa/' . ($this->attributes['slug'] ?? $this->attributes['id']));
+    }
+
+    /**
+     * Calcula quantos dígitos os números devem ter
+     */
+    public function getNumberDigits(): int
+    {
+        $lastNumber = $this->getLastNumber();
+        return max(2, strlen((string) $lastNumber));
+    }
+
+    /**
+     * Retorna o número vencedor formatado
+     */
+    public function getFormattedWinningNumber(): string
+    {
+        if (empty($this->attributes['winning_number'])) {
+            return '-';
+        }
+
+        return str_pad($this->attributes['winning_number'], $this->getNumberDigits(), '0', STR_PAD_LEFT);
     }
 }
