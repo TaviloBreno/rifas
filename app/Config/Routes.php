@@ -27,6 +27,8 @@ $routes->post('contato', 'HomeController::sendContact');
 // Checkout e Pagamento (não precisa estar logado)
 $routes->get('checkout/(:segment)', 'HomeController::checkout/$1');
 $routes->post('checkout/(:segment)', 'HomeController::processCheckout/$1');
+$routes->get('confirmacao/(:num)', 'TicketController::confirm/$1');
+$routes->post('confirmacao/(:num)/pagamento', 'TicketController::processPayment/$1');
 $routes->get('pagamento/(:any)', 'HomeController::payment/$1');
 $routes->get('pedido/(:any)', 'HomeController::orderDetails/$1');
 
